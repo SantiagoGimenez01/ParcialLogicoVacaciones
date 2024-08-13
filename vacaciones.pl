@@ -6,6 +6,29 @@
 % ● Carlos no se va a tomar vacaciones por ahora
 % Se pide que defina los predicados correspondientes, y justifique sus decisiones en base a conceptos vistos en la cursada.
 
+% seVaA(Persona, Lugar).
+seVaA(dodain, pehuenia).
+seVaA(dodain, sanMartin).
+seVaA(dodain, esquel).
+seVaA(dodain, sarmiento).
+seVaA(dodain, camarones).
+seVaA(dodain, playasDoradas).
+seVaA(alf, bariloche).
+seVaA(alf, sanMartin).
+seVaA(alf, elBolson).
+seVaA(nico, marDelPlata).
+seVaA(vale, calafate).
+seVaA(vale, elBolson).
+
+seVaA(martu, Lugar):-
+    seVaA(alf, Lugar).
+seVaA(martu, Lugar):-
+    seVaA(nico, Lugar).
+
+% Como juan no sabe si va a ir a villaGessel o a federacion, todavia no puedo representarlo con un hecho, ya que esto confirmaria que se va a alguno
+% de los dos destinos. Por lo que si no sabemos cual es el hecho todavia, entonces los suponemos falso y no lo agregamos ya que prolog trabaja con el
+% principio de universo cerrado y todo lo que no escribamos lo presupone falso. Lo mismo con carlos que no va a tomar vacaciones, simplemente no lo
+% escribimos y prolog toma como falso que carlos se va a algun lado.
 
 % Punto 2: Vacaciones copadas (4 puntos)
 % Incorporamos ahora información sobre las atracciones de cada lugar.
@@ -27,17 +50,71 @@
 % ● cualquier parque nacional es copado
 % El predicado debe ser inversible.
 
+% esCopada(Atraccion).
+esCopada(cerro(_, MetrosAltura)):-
+    MetrosAltura > 2000.
+esCopada(cuerpoAgua(_, sePuedePescar, _)).
+esCopada(cuerpoAgua(_, _, Temperatura)):-
+    Temperatura > 20.
+esCopada(playa(DiferenciaMareas)):-
+    DiferenciaMareas < 5.
+esCopada(excursion(Nombre)):-
+    length(Nombre, Largo),
+    Largo > 7.
+esCopada(parqueNacional(_)).
+
+
+% tieneAtraccion(Lugar, Atraccion).
+tieneAtraccion(esquel, parqueNacional(losAlerces)).
+tieneAtraccion(esquel, excursion([t,r,o,c,h,i,t,a])).
+tieneAtraccion(esquel, excursion([t,r,e,v,e,l,i,n])).
+tieneAtraccion(pehuenia, cerro(bateaMahuida, 2000)).
+tieneAtraccion(pehuenia, cuerpoDeAgua(moquehue, sePuedePescar, 14)).
+tieneAtraccion(pehuenia, cuerpoDeAgua(alumine, sePuedePescar, 19)).
+tieneAtraccion(marDelPlata, playa(4)).
+tieneAtraccion(marDelPlata, cuerpoAgua(lagoMardel, noSePuedePescar, 10)).
+% lugarConAtraccionCopada(Lugar).
+lugarConAtraccionCopada(Lugar):-
+    tieneAtraccion(Lugar, Atraccion),
+    esCopada(Atraccion).
+
+% tuvoVacacionesCopadas(Persona).
+tuvoVacacionesCopadas(Persona):-
+    seVaA(Persona, _),
+    forall(seVaA(Persona, Lugar), lugarConAtraccionCopada(Lugar)).
+
 % Punto 3: Ni se me cruzó por la cabeza (2 puntos)
 % Cuando dos personas distintas no coinciden en ningún lugar como destino decimos que no se cruzaron. 
 % Por ejemplo, Dodain no se cruzó con Nico ni con Vale (sí con Alf en San Martín de los Andes). 
 % Vale no se cruzó con Dodain ni con Nico (sí con Alf en El Bolsón). 
 % El predicado debe ser completamente inversible.
 
+noSeCruzaron(Uno, Otro):-
+    seVaA(Uno, _),
+    seVaA(Otro, _),
+    forall(seVaA(Uno, Lugar), not(seVaA(Otro, Lugar))),
+    Uno \= Otro.
+
 % Punto 4: Vacaciones gasoleras (2 puntos)
 % Incorporamos el costo de vida de cada destino:
 % Queremos saber si unas vacaciones fueron gasoleras para una persona. Esto ocurre si todos los destinos son gasoleros, es decir, tienen un costo de 
 % vida menor a 160. Alf, Nico y Martu hicieron vacaciones gasoleras.
 % El predicado debe ser inversible.
+% costoDeVida(Destino, Costo).
+costoDeVida(sarmiento, 100).
+costoDeVida(esquel, 150).
+costoDeVida(pehuenia, 180).
+costoDeVida(sanMartin, 150).
+costoDeVida(camarones, 135).
+costoDeVida(playasDoradas, 170).
+costoDeVida(bariloche, 140).
+costoDeVida(calafate, 240).
+costoDeVida(elBolson, 145).
+costoDeVida(marDelPlata, 140).
+
+
+
+
 
 % Punto 5: Itinerarios posibles (3 puntos)
 % Queremos conocer todas las formas de armar el itinerario de un viaje para una persona sin importar el recorrido. 
