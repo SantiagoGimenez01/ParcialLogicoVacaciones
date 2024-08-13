@@ -112,9 +112,13 @@ costoDeVida(calafate, 240).
 costoDeVida(elBolson, 145).
 costoDeVida(marDelPlata, 140).
 
+esGasolero(Destino):-
+    costoDeVida(Destino, Costo),
+    Costo < 160.
 
-
-
+vacacionesGasoleras(Persona):-
+    seVaA(Persona, _),
+    forall(seVaA(Persona, Lugar), esGasolero(Lugar)).
 
 % Punto 5: Itinerarios posibles (3 puntos)
 % Queremos conocer todas las formas de armar el itinerario de un viaje para una persona sin importar el recorrido. 
@@ -129,3 +133,17 @@ costoDeVida(marDelPlata, 140).
 % (claramente no es lo mismo ir primero a El Bolsón y después a Bariloche que primero a
 % Bariloche y luego a El Bolsón, pero el itinerario tiene que incluir los 3 destinos a los que
 % quiere ir Alf).
+
+destinosPosibles(Persona, DestinosPosibles):-
+    findall(Lugar, seVaA(Persona, Lugar), Destinos),
+    permutarDestinos(Destinos, DestinosPosibles).
+
+permutarDestinos([], []).
+permutarDestinos(Destinos, [Primero|Resto]) :-
+    seleccionar(Primero, Destinos, RestoDestinos),
+    permutarDestinos(RestoDestinos, Resto).
+
+seleccionar(Elemento, [Elemento|Resto], Resto).
+seleccionar(Elemento, [Otro|Resto], [Otro|RestoSeleccionado]) :-
+    seleccionar(Elemento, Resto, RestoSeleccionado).
+
